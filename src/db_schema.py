@@ -419,6 +419,35 @@ class TempoConfig(Base):
         """Return the string representation of the Config object."""
         return self.value
 
+class Flex(Base):
+    """Represents the Flex class."""
+
+    __tablename__ = "flex"
+
+    date = Column(DateTime, primary_key=True, index=True, unique=True)
+    tariff = Column(Text, nullable=False, index=True)
+
+    def __repr__(self):
+        """Return the string representation of the Flex object."""
+        return f"Flex(" f"date={self.date!r}, " f"tariff={self.tariff!r})"
+
+
+class FlexConfig(Base):
+    """Represents the FlexConfig class."""
+
+    __tablename__ = "flex_config"
+
+    key = Column(Text, primary_key=True, index=True, unique=True)
+    value = Column(Text, nullable=False)
+
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+    def __str__(self):
+        """Return the string representation of the FlexConfig object."""
+        return self.value
+
 
 class Ecowatt(Base):
     """Represents the Ecowatt class."""

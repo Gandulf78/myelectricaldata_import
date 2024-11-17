@@ -198,7 +198,7 @@ class Tempo:
                     response_json = json.loads(query_response.text)
                     DatabaseTempo().set_config("price", response_json)
                     response = {"error": False, "description": "", "items": response_json}
-                    logging.info(" => Toutes les valeurs sont misent à jours.")
+                    logging.info(" => Toutes les valeurs sont mises à jour.")
                 except Exception as e:
                     logging.error(e)
                     traceback.print_exc()

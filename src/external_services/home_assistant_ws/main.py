@@ -14,10 +14,10 @@ from const import TEMPO_BEGIN, TIMEZONE, URL_CONFIG_FILE
 from database.config import DatabaseConfig
 from database.detail import DatabaseDetail
 from database.tempo import DatabaseTempo
+from database.flex import DatabaseFlex
 from database.usage_points import DatabaseUsagePoints
 from models.stat import Stat
 from utils import chunks_list
-
 
 class HomeAssistantWs:
     """Class to interact with Home Assistant WebSocket API."""
@@ -233,7 +233,7 @@ class HomeAssistantWs:
                                 statistic_id = f"{statistic_id}_hp_{measurement_direction}"
                                 cost = value * self.usage_point_id_config.consumption_price_hp / 1000
                                 tag = "hp"
-                        elif plan.upper() == "TEMPO":
+                        elif plan.upper() == "Tempo" :
                             hour_type = stats.get_mesure_type(data.date)
                             max_time = 2359
                             if TEMPO_BEGIN <= hour_minute <= max_time:
@@ -243,7 +243,7 @@ class HomeAssistantWs:
 
                             if date not in tempo_color_ref:
                                 logging.error(f"Import impossible, pas de donnée tempo sur la date du {data.date}")
-                            else:
+                            else:                   
                                 day_color = tempo_color_ref[date]
                                 tempo_color = f"{day_color}{hour_type}"
                                 tempo_color_price_key = f"{day_color.lower()}_{hour_type.lower()}"
@@ -251,7 +251,22 @@ class HomeAssistantWs:
                                 cost = value / 1000 * tempo_price
                                 name = f"{name} {tempo_color} {measurement_direction}"
                                 statistic_id = f"{statistic_id}_{tempo_color.lower()}_{measurement_direction}"
-                                tag = tempo_color.lower()
+                                tag = tempo_color.lower()                        
+                        elif plan.upper() == "FLEX":
+                           # Récupérer le statut Flex
+                            db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
+                            flex_manager = db_flex.get_flex_manager()
+                            hour_type = stats.get_mesure_type(data.date)
+                            max_time = 2359
+                            if TEMPO_BEGIN <= hour_minute <= max_time:
+                                date = datetime.combine(data.date, datetime.min.time())
+                            else:
+                                date = datetime.combine(data.date - timedelta(days=1), datetime.min.time())
+                            day_flex = flex_manager.get_flex_status(date)
+                            flex_hour = f"{day_flex}{hour_type}"
+                            name = f"{name} {flex_hour} {measurement_direction}"
+                            statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                            tag = flex_hour.lower()                             
                         else:
                             logging.error(f"Plan {plan} inconnu.")
 
@@ -290,6 +305,11 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
+                            
+                        # Ajout de la sécurité pour `cost`
+                        if 'cost' not in locals():
+                            cost = 0  # Valeur par défaut si le coût n'est pas calculé
+    
                         stats_euro[statistic_id]["tag"] = tag
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost

@@ -11,3 +11,4 @@ data
 .tox
 **/__pycache__/
 MED Import.session.sql
+.DS_Store

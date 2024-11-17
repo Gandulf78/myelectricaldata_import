@@ -15,8 +15,8 @@ class Plan:
         self.base: str = "BASE"
         self.hchp: str = "HC/HP"
         self.tempo: str = "TEMPO"
-
-
+        self.flex: str = "FLEX"
+        
 class UsagePointId:
     """UsagePoint templates."""
 
@@ -123,7 +123,7 @@ class UsagePointId:
             if current_plan not in plan.__dict__.values():
                 sys.exit(
                     f'[MyElectricalData][{self.usage_point_id}] Erreur de configuration, le plan "{current_plan} '
-                    f"n'éxiste pas. ({plan_available[:-2]})"
+                    f"n'existe pas. ({plan_available[:-2]})"
                 )
 
             self.change(sub_key, self.config[self.key][self.usage_point_id][sub_key].upper(), False)
