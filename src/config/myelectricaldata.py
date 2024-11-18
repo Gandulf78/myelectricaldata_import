@@ -72,6 +72,12 @@ class UsagePointId:
             "consumption_max_power": True,
             "consumption_price_hc": 0,
             "consumption_price_hp": 0,
+            "consumption_price_flex_normal_hc": 0,
+            "consumption_price_flex_normal_hp": 0,
+            "consumption_price_flex_sobriete_hc": 0,
+            "consumption_price_flex_sobriete_hp": 0,
+            "consumption_price_flex_bonus_hc": 0,
+            "consumption_price_flex_bonus_hp": 0,
             "consumption_price_base": 0,
             "consumption_max_date": "",
             "consumption_detail_max_date": "",
@@ -151,6 +157,36 @@ class UsagePointId:
             self.change(sub_key, self.default()[sub_key], False)
         try:
             sub_key = "consumption_price_hp"
+            self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "consumption_price_flex_normal_hc"
+            self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "consumption_price_flex_normal_hp"
+            self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "consumption_price_flex_sobriete_hc"
+            self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "consumption_price_flex_sobriete_hp"
+            self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "consumption_price_flex_bonus_hc"
+            self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "consumption_price_flex_bonus_hp"
             self.change(sub_key, float(self.config[self.key][self.usage_point_id][sub_key]), False)
         except Exception:
             self.change(sub_key, self.default()[sub_key], False)
@@ -351,6 +387,69 @@ class UsagePointId:
 
     @consumption_price_hc.setter
     def consumption_price_hc(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_normal_hc(self) -> float:
+        """Consumption price HC."""
+        return self._consumption_price_hc
+
+    @consumption_price_flex_normal_hc.setter
+    def consumption_price_flex_normal_hc(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_normal_hp(self) -> float:
+        """Consumption price HC."""
+        return self._consumption_price_flex_normal_hp
+
+    @consumption_price_flex_normal_hp.setter
+    def consumption_price_flex_normal_hp(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_sobriete_hp(self) -> float:
+        """Consumption price HC."""
+        return self._consumption_price_flex_sobriete_hp
+
+    @consumption_price_flex_sobriete_hp.setter
+    def consumption_price_flex_sobriete_hp(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_sobriete_hc(self) -> float:
+        """Consumption sobriete HC."""
+        return self._consumption_price_flex_sobriete_hc
+
+    @consumption_price_flex_sobriete_hc.setter
+    def consumption_price_flex_sobriete_hc(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_sobriete_hp(self) -> float:
+        """Consumption sobriete HP."""
+        return self._consumption_price_flex_sobriete_hp
+
+    @consumption_price_flex_sobriete_hp.setter
+    def consumption_price_flex_sobriete_hp(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_bonus_hc(self) -> float:
+        """Consumption bonus HC."""
+        return self._consumption_price_flex_bonus_hc
+
+    @consumption_price_flex_bonus_hc.setter
+    def consumption_price_flex_bonus_hc(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def consumption_price_flex_bonus_hp(self) -> float:
+        """Consumption bonus HP."""
+        return self._consumption_price_flex_bonus_hp
+
+    @consumption_price_flex_bonus_hp.setter
+    def consumption_price_flex_bonus_hp(self, value):
         self.change(inspect.currentframe().f_code.co_name, value)
 
     @property

@@ -103,34 +103,9 @@ class FlexDayManager:
 
         status_map = {
             "RAS": "Normal",
-            "ZENF_PM": "Sobriété",
+            "ZENF_PM": "Sobriete",
             "ZENF_BONIF": "Bonus",
         }
         status = status_map.get(status_code, "Inconnu")
         self.db.set_flex_day(date, status)
         return status
-
-if __name__ == "__main__":
-    # Configurez le niveau de log
-    logging.basicConfig(level=logging.INFO)
-
-    # Instanciez la gestion de la base Flex
-    db_flex = DatabaseFlex()
-
-    # Instanciez le gestionnaire de jours Flex
-    manager = FlexDayManager(db=db_flex)
-
-    # Liste des dates à tester
-    test_dates = [
-        "2024-11-18",  # Jour en semaine pendant Sobriété
-        "2024-07-01",  # Hors période Sobriété
-        "2024-11-19",  # Week-end
-        "2024-12-25",  # Pendant Sobriété, mais peut-être un jour spécial
-        "2024-01-14",  # Sobriété (première période)
-        "2024-11-16",  # Samedi
-    ]
-
-    # Testez et affichez les résultats
-    for date in test_dates:
-        status = manager.get_flex_status(date)
-        print(f"Statut pour le {date} : {status}")

@@ -41,6 +41,12 @@ class UsagePoints(Base):
     consumption_price_base = Column(Float, nullable=False, default=0)
     consumption_price_hc = Column(Float, nullable=False, default=0)
     consumption_price_hp = Column(Float, nullable=False, default=0)
+    consumption_price_flex_normal_hc = Column(Float, nullable=False, default=0)
+    consumption_price_flex_normal_hp = Column(Float, nullable=False, default=0)
+    consumption_price_flex_sobriete_hc = Column(Float, nullable=False, default=0)
+    consumption_price_flex_sobriete_hp = Column(Float, nullable=False, default=0)
+    consumption_price_flex_bonus_hc = Column(Float, nullable=False, default=0)
+    consumption_price_flex_bonus_hp = Column(Float, nullable=False, default=0)
     production_price = Column(Float, nullable=False, default=0)
     offpeak_hours_0 = Column(Text, nullable=True)
     offpeak_hours_1 = Column(Text, nullable=True)
@@ -94,6 +100,12 @@ class UsagePoints(Base):
             f"consumption_price_base={self.consumption_price_base!r}, "
             f"consumption_price_hc={self.consumption_price_hc!r}, "
             f"consumption_price_hp={self.consumption_price_hp!r}, "
+            f"consumption_price_flex_normal_hc={self.consumption_price_flex_normal_hc!r}, "
+            f"consumption_price_flex_normal_hp={self.consumption_price_flex_normal_hp!r}, "
+            f"consumption_price_flex_sobriete_hc={self.consumption_price_flex_sobriete_hc!r}, "
+            f"consumption_price_flex_sobriete_hp={self.consumption_price_flex_sobriete_hp!r}, "
+            f"consumption_price_flex_bonus_hc={self.consumption_price_flex_bonus_hc!r}, "
+            f"consumption_price_flex_bonus_hp={self.consumption_price_flex_bonus_hp!r}, "
             f"consumption_max_power={self.consumption_max_power!r}, "
             f"offpeak_hours_0={self.offpeak_hours_0!r}, "
             f"offpeak_hours_1={self.offpeak_hours_1!r}, "

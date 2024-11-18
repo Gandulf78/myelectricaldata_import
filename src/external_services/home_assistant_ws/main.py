@@ -255,15 +255,31 @@ class HomeAssistantWs:
                         elif plan.upper() == "FLEX" :
                            # Récupérer le statut Flex
                             db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
+                            flex_manager = FlexDayManager(db_flex)
                             hour_type = stats.get_mesure_type(data.date)
-                            day_flex = db_flex.get_flex_status(date.date)
+                            day_flex = flex_manager.get_flex_status(date.date)
                             if day_flex == "Inconnu":
                               logging.error(f"Import impossible, pas de donnée flex sur la date du {data.date}")
                             else:
-                              flex_hour = f"{day_flex}{hour_type}"
+                              flex_hour = f"{day_flex.lower()}_{hour_type}"
                               name = f"{name} {flex_hour} {measurement_direction}"
                               statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
-                              tag = flex_hour.lower()                            
+                              tag = flex_hour.lower()
+                                                          
+                              if flex_hour == "normal_HC":
+                                cost = value * self.usage_point_id_config.consumption_flex_normal_hc / 1000
+                              elif flex_hour == "normal_HP":
+                                cost = value * self.usage_point_id_config.consumption_flex_normal_hp / 1000    
+                              elif flex_hour == "sobriete_HC":
+                                cost = value * self.usage_point_id_config.consumption_flex_sobriete_hc / 1000
+                              elif flex_hour == "sobriete_HP":
+                                cost = value * self.usage_point_id_config.consumption_flex_sobriete_hp / 1000                           
+                              elif flex_hour == "bonus_HC":
+                                cost = value * self.usage_point_id_config.consumption_flex_bonus_hc / 1000                           
+                              elif flex_hour == "bonus_HP":
+                                cost = value * self.usage_point_id_config.consumption_flex_bonus_hp / 1000     
+                              else:
+                                cost = 0.0                                                                                
                         else:
                             logging.error(f"Plan {plan} inconnu.")
 
@@ -302,11 +318,7 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
-                            
-                        # Ajout de la sécurité pour `cost`
-                        if 'cost' not in locals():
-                            cost = 0  # Valeur par défaut si le coût n'est pas calculé
-    
+                                
                         stats_euro[statistic_id]["tag"] = tag
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost

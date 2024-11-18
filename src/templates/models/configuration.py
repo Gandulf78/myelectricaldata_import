@@ -125,6 +125,42 @@ class Configuration:
                     "type": 0.1,
                     "default": 0.175,
                 },
+                "consumption_price_flex_normal_hc": {
+                    "title": "Prix TTC HC",
+                    "help": 'Permet de définir le prix du kWh en heures "creuse" Flex Normal pour l\'estimation du coût.',
+                    "type": 0.1,
+                    "default": 0.175,
+                },
+                "consumption_price_flex_normal_hp": {
+                    "title": "Prix TTC HP",
+                    "help": 'Permet de définir le prix du kWh en heures "pleines" Flex Normal pour l\'estimation du coût.',
+                    "type": 0.1,
+                    "default": 0.175,
+                },                
+                "consumption_price_flex_sobriete_hc": {
+                    "title": "Prix TTC HC",
+                    "help": 'Permet de définir le prix du kWh en heures "creuse" Flex Sobriété pour l\'estimation du coût.',
+                    "type": 0.1,
+                    "default": 0.175,
+                },
+                "consumption_price_flex_sobriete_hp": {
+                    "title": "Prix TTC HP",
+                    "help": 'Permet de définir le prix du kWh en heures "pleines" Flex Sobriété pour l\'estimation du coût.',
+                    "type": 0.1,
+                    "default": 0.175,
+                },                                
+                "consumption_price_flex_bonus_hc": {
+                    "title": "Prix TTC HC",
+                    "help": 'Permet de définir le prix du kWh en heures "creuse" Flex Bonus pour l\'estimation du coût.',
+                    "type": 0.1,
+                    "default": 0.175,
+                },
+                "consumption_price_flex_bonus_hp": {
+                    "title": "Prix TTC HP",
+                    "help": 'Permet de définir le prix du kWh en heures "pleines" Flex Bonus pour l\'estimation du coût.',
+                    "type": 0.1,
+                    "default": 0.175,
+                },                                
                 "consumption_price_base": {
                     "title": "Prix TTC BASE",
                     "help": 'Permet de définir le prix du kWh en heures "classique" pour l\'estimation du coût.',

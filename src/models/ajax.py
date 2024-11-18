@@ -43,6 +43,12 @@ class UsagePoint:
     consumption_detail_max_date: str
     consumption_price_hc: str
     consumption_price_hp: str
+    consumption_price_flex_normal_hc: str
+    consumption_price_flex_normal_hp: str
+    consumption_price_flex_sobriete_hc: str
+    consumption_price_flex_sobriete_hp: str
+    consumption_price_flex_bonus_hc: str
+    consumption_price_flex_bonus_hp: str
     consumption_price_base: str
     offpeak_hours_0: str
     offpeak_hours_1: str

@@ -99,6 +99,30 @@ $("#formConfiguration").validate({
             required: true,
             number: true,
         },
+        consumption_price_flex_normal_hc: {
+            required: true,
+            number: true,
+        },
+        consumption_price_flex_normal_hp: {
+            required: true,
+            number: true,
+        },
+        consumption_price_flex_sobriete_hc: {
+            required: true,
+            number: true,
+        },
+        consumption_price_flex_sobriete_hp: {
+            required: true,
+            number: true,
+        },
+        consumption_price_flex_bonus_hc: {
+            required: true,
+            number: true,
+        },
+        consumption_price_flex_bonus_hp: {
+            required: true,
+            number: true,
+        },                   
         consumption_price_base: {
             required: true,
             number: true,
