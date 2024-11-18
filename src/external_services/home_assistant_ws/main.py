@@ -233,7 +233,7 @@ class HomeAssistantWs:
                                 statistic_id = f"{statistic_id}_hp_{measurement_direction}"
                                 cost = value * self.usage_point_id_config.consumption_price_hp / 1000
                                 tag = "hp"
-                        elif plan.upper() == "Tempo" :
+                        elif plan.upper() == "TEMPO" :
                             hour_type = stats.get_mesure_type(data.date)
                             max_time = 2359
                             if TEMPO_BEGIN <= hour_minute <= max_time:
@@ -252,21 +252,18 @@ class HomeAssistantWs:
                                 name = f"{name} {tempo_color} {measurement_direction}"
                                 statistic_id = f"{statistic_id}_{tempo_color.lower()}_{measurement_direction}"
                                 tag = tempo_color.lower()                        
-                        elif plan.upper() == "FLEX":
+                        elif plan.upper() == "FLEX" :
                            # Récupérer le statut Flex
                             db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
-                            flex_manager = db_flex.get_flex_manager()
                             hour_type = stats.get_mesure_type(data.date)
-                            max_time = 2359
-                            if TEMPO_BEGIN <= hour_minute <= max_time:
-                                date = datetime.combine(data.date, datetime.min.time())
+                            day_flex = db_flex.get_flex_status(date.date)
+                            if day_flex == "Inconnu":
+                              logging.error(f"Import impossible, pas de donnée flex sur la date du {data.date}")
                             else:
-                                date = datetime.combine(data.date - timedelta(days=1), datetime.min.time())
-                            day_flex = flex_manager.get_flex_status(date)
-                            flex_hour = f"{day_flex}{hour_type}"
-                            name = f"{name} {flex_hour} {measurement_direction}"
-                            statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
-                            tag = flex_hour.lower()                             
+                              flex_hour = f"{day_flex}{hour_type}"
+                              name = f"{name} {flex_hour} {measurement_direction}"
+                              statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                              tag = flex_hour.lower()                            
                         else:
                             logging.error(f"Plan {plan} inconnu.")
 

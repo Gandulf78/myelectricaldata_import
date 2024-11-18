@@ -1,9 +1,10 @@
 import json
 from datetime import datetime
-from sqlalchemy import Column, String, Date, select, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import Column, String, Date, select
+from sqlalchemy.orm import declarative_base
 import requests
 import logging
+from . import DB  # Assurez-vous que DB est correctement importé
 
 # Définir la base pour les modèles SQLAlchemy
 Base = declarative_base()
@@ -18,16 +19,13 @@ class FlexConfig(Base):
     key = Column(String, primary_key=True)
     value = Column(String)
 
-# Classe qui gère la base de données Flex
 class DatabaseFlex:
     """Classe pour gérer les jours Flex dans la base de données."""
 
-    def __init__(self, engine):
+    def __init__(self):
         """Initialisation de la gestion de la base de données."""
-        self.engine = engine
-        self.session_factory = sessionmaker(bind=self.engine)
-        self.session = self.session_factory()
-        Base.metadata.create_all(bind=self.engine)  # Crée les tables si elles n'existent pas
+        self.session = DB.session()
+        Base.metadata.create_all(bind=self.session.get_bind())  # Crée les tables si elles n'existent pas
 
     def get_flex_day(self, date):
         """Récupère le statut d'un jour Flex."""
@@ -37,14 +35,13 @@ class DatabaseFlex:
 
     def set_flex_day(self, date, status):
         """Insère ou met à jour le statut d'un jour Flex."""
-        with self.session.begin():
-            flex_day = self.session.scalars(select(FlexDay).where(FlexDay.date == date)).one_or_none()
-            if flex_day:
-                flex_day.status = status
-            else:
-                flex_day = FlexDay(date=date, status=status)
-                self.session.add(flex_day)
-            self.session.commit()
+        flex_day = self.get_flex_day(date)
+        if flex_day:
+            flex_day.status = status
+        else:
+            flex_day = FlexDay(date=date, status=status)
+            self.session.add(flex_day)
+        self.session.flush()
 
     def get_flex_config(self, key):
         """Récupère la valeur d'une clé de configuration Flex."""
@@ -54,16 +51,14 @@ class DatabaseFlex:
 
     def set_flex_config(self, key, value):
         """Définit la valeur d'une clé de configuration Flex."""
-        with self.session.begin():
-            config = self.session.scalars(select(FlexConfig).where(FlexConfig.key == key)).one_or_none()
-            if config:
-                config.value = json.dumps(value)
-            else:
-                config = FlexConfig(key=key, value=json.dumps(value))
-                self.session.add(config)
-            self.session.commit()
+        query = select(FlexConfig).where(FlexConfig.key == key)
+        config = self.session.scalars(query).one_or_none()
+        if config:
+            config.value = json.dumps(value)
+        else:
+            self.session.add(FlexConfig(key=key, value=json.dumps(value)))
+        self.session.flush()
 
-# Classe qui gère les jours Flex via l'API EDF et la base de données locale
 class FlexDayManager:
     """Classe pour gérer les jours Flex via l'API EDF et une base de données locale."""
 
@@ -89,20 +84,15 @@ class FlexDayManager:
 
     def get_flex_status(self, date):
         """Récupère le statut Flex pour une date donnée."""
-        # Vérifie si la date est un week-end
         if self.is_weekend(date):
             return "Normal"
-
-        # Vérifie si la date est dans une période de Sobriété
         if not self.is_sobriety_period(date):
             return "Normal"
 
-        # Vérifie le cache
         cached_status = self.db.get_flex_day(date)
         if cached_status:
             return cached_status
 
-        # Appelle l'API EDF si le statut n'est pas en cache
         try:
             response = requests.get(f"{self.API_URL}?dateRelevant={date.strftime('%Y-%m-%d')}")
             response.raise_for_status()  # Vérifie si la réponse est OK (code 200)
@@ -111,15 +101,12 @@ class FlexDayManager:
             logging.error(f"Erreur lors de l'appel à l'API EDF pour Flex : {e}")
             return None
 
-        # Traduire le statut API en un statut utilisateur
         status_map = {
             "RAS": "Normal",
             "ZENF_PM": "Sobriété",
             "ZENF_BONIF": "Bonus",
         }
         status = status_map.get(status_code, "Inconnu")
-
-        # Stocke dans la base de données
         self.db.set_flex_day(date, status)
         return status
 
@@ -128,8 +115,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Instanciez la gestion de la base Flex
-    engine = create_engine("sqlite:///database.db", echo=True)
-    db_flex = DatabaseFlex(engine=engine)
+    db_flex = DatabaseFlex()
 
     # Instanciez le gestionnaire de jours Flex
     manager = FlexDayManager(db=db_flex)
