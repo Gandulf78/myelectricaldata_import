@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from sqlalchemy import Column, String, Date, select
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.exc import IntegrityError
 import requests
 import logging
 from . import DB  # Assurez-vous que DB est correctement importé
@@ -34,14 +35,20 @@ class DatabaseFlex:
         return result.status if result else None
 
     def set_flex_day(self, date, status):
-        """Insère ou met à jour le statut d'un jour Flex."""
-        flex_day = self.get_flex_day(date)
-        if flex_day:
-            flex_day.status = status
+        """Ajoute ou met à jour le statut Flex pour une date donnée."""
+        existing_entry = self.session.query(FlexDay).filter_by(date=date).first()
+        if existing_entry:
+            # Mettre à jour si l'entrée existe déjà
+            existing_entry.status = status
         else:
-            flex_day = FlexDay(date=date, status=status)
-            self.session.add(flex_day)
-        self.session.flush()
+            # Ajouter une nouvelle entrée si elle n'existe pas
+            new_entry = FlexDay(date=date, status=status)
+            self.session.add(new_entry)
+        try:
+            self.session.flush()  # Valider temporairement les changements
+        except IntegrityError as e:
+            logging.error(f"Erreur d'intégrité lors de l'ajout/mise à jour : {e}")
+            self.session.rollback()  # Annuler les modifications si erreur
 
     def get_flex_config(self, key):
         """Récupère la valeur d'une clé de configuration Flex."""
@@ -83,29 +90,38 @@ class FlexDayManager:
         return dt.weekday() in [5, 6]  # Samedi = 5, Dimanche = 6
 
     def get_flex_status(self, date):
-        """Récupère le statut Flex pour une date donnée."""
-        if self.is_weekend(date):
-            return "Normal"
-        if not self.is_sobriety_period(date):
-            return "Normal"
-
-        cached_status = self.db.get_flex_day(date)
-        if cached_status:
-            return cached_status
-
-        try:
-            response = requests.get(f"{self.API_URL}?dateRelevant={date.strftime('%Y-%m-%d')}")
-            response.raise_for_status()  # Vérifie si la réponse est OK (code 200)
-            status_code = response.json().get("etat")
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Erreur lors de l'appel à l'API EDF pour Flex : {e}")
-            return None
-
-        status_map = {
-            "RAS": "Normal",
-            "ZENF_PM": "Sobriete",
-            "ZENF_BONIF": "Bonus",
-        }
-        status = status_map.get(status_code, "Inconnu")
-        self.db.set_flex_day(date, status)
-        return status
+          """Récupère le statut Flex pour une date donnée."""
+          if self.is_weekend(date):
+                  return "Normal"
+          if not self.is_sobriety_period(date):
+                  return "Normal"
+  
+          cached_status = self.db.get_flex_day(date)
+          if cached_status is not None and cached_status != "":
+                  return cached_status
+  
+          try:
+                  response = requests.get(f"{self.API_URL}?dateRelevant={date.strftime('%Y-%m-%d')}")
+                  response.raise_for_status()  # Vérifie si la réponse est OK (code 200)
+                  status_code = response.json().get("couleurJourJ")
+                  if status_code is None:
+                          logging.warning(f"L'API n'a pas retourné de 'etat' pour la date {date}")
+                          return "Inconnu"
+          except requests.exceptions.RequestException as e:
+                  logging.error(f"Erreur lors de l'appel à l'API EDF pour Flex : {e}")
+                  return None
+  
+          status_map = {
+                  "RAS": "Normal",
+                  "ZENF_PM": "Sobriete",
+                  "ZENF_BONIF": "Bonus",
+          }
+          status = status_map.get(status_code, None)
+          if status is None:
+                  logging.warning(f"Statut API inconnu pour la date {date}: {status_code}")
+                  status = "Inconnu"
+  
+          # Enregistrer le statut dans le cache
+          self.db.set_flex_day(date, status)
+          logging.info(f"Statut Flex enregistré pour la date {date}: {status}")
+          return status
