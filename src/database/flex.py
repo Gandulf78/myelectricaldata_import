@@ -73,9 +73,9 @@ class FlexDayManager:
     def __init__(self, db: DatabaseFlex):
         self.db = db
 
-    def is_sobriety_period(self, date):
+    def is_sobriety_period(self, dt):
         """Vérifie si une date donnée est dans la période de Sobriété."""
-        dt = datetime.strptime(date.strftime("%Y-%m-%d"), "%Y-%m-%d")
+        
         year = dt.year
         sobriety_start_1 = datetime(year, 1, 1)
         sobriety_end_1 = datetime(year, 4, 15)
@@ -83,24 +83,24 @@ class FlexDayManager:
         sobriety_end_2 = datetime(year, 12, 31)
         return (sobriety_start_1 <= dt <= sobriety_end_1) or (sobriety_start_2 <= dt <= sobriety_end_2)
 
-    def is_weekend(self, date):
+    def is_weekend(self, dt):
         """Vérifie si une date donnée est un week-end."""
-        dt = datetime.strptime(date.strftime("%Y-%m-%d"), "%Y-%m-%d")
         return dt.weekday() in [5, 6]  # Samedi = 5, Dimanche = 6
 
     def get_flex_status(self, date):
         """Récupère le statut Flex pour une date donnée."""
-        if self.is_weekend(date):
+        dt = datetime.strptime(date, "%Y-%m-%d")
+        if self.is_weekend(dt):
             return "Normal"
-        if not self.is_sobriety_period(date):
+        if not self.is_sobriety_period(dt):
             return "Normal"
 
-        cached_status = self.db.get_flex_day(date)
+        cached_status = self.db.get_flex_day(dt)
         if cached_status is not None and cached_status != "":
             return cached_status
 
         try:
-            response = requests.get(f"{self.API_URL}?dateRelevant={date.strftime('%Y-%m-%d')}")
+            response = requests.get(f"{self.API_URL}?dateRelevant={date}")
             response.raise_for_status()  # Vérifie si la réponse est OK (code 200)
             status_code = response.json().get("couleurJourJ")
             if status_code is None:
@@ -121,6 +121,6 @@ class FlexDayManager:
             status = "Inconnu"
 
         # Enregistrer le statut dans le cache
-        self.db.set_flex_day(date, status)
+        self.db.set_flex_day(dt, status)
         logging.info(f"Statut Flex enregistré pour la date {date}: {status}")
         return status

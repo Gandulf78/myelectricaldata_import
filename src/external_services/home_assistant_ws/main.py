@@ -200,7 +200,9 @@ class HomeAssistantWs:
                         tempo_color_ref[tempo_data.date] = tempo_data.color
 
                     stats = Stat(usage_point_id=self.usage_point_id, measurement_direction="consumption")
-
+                    strdate = ""
+                    day_flex = "Inconnu"
+                    
                     for data in detail:
                         year = int(f'{data.date.strftime("%Y")}')
                         if last_year is None or year != last_year:
@@ -257,7 +259,12 @@ class HomeAssistantWs:
                             db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
                             flex_manager = FlexDayManager(db_flex)
                             hour_type = stats.get_mesure_type(data.date)
-                            day_flex = flex_manager.get_flex_status(data.date)
+                            newstrdate = data.date.strftime("%Y-%m-%d")
+                            
+                            if newstrdate != strdate:
+                              strdate = newstrdate
+                              day_flex = flex_manager.get_flex_status(strdate)
+
                             if day_flex == "Inconnu":
                               logging.error(f"Import impossible, pas de donnée flex sur la date du {data.date}")
                             else:
