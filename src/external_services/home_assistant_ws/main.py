@@ -14,7 +14,7 @@ from const import TEMPO_BEGIN, TIMEZONE, URL_CONFIG_FILE
 from database.config import DatabaseConfig
 from database.detail import DatabaseDetail
 from database.tempo import DatabaseTempo
-from database.flex import DatabaseFlex
+from database.flex import DatabaseFlex, FlexDayManager
 from database.usage_points import DatabaseUsagePoints
 from models.stat import Stat
 from utils import chunks_list
