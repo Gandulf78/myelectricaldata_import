@@ -267,6 +267,21 @@ class HomeAssistantWs:
 
                             if day_flex == "Inconnu":
                               logging.error(f"Import impossible, pas de donnée flex sur la date du {data.date}")
+                              name = f"{name} {flex_hour} {measurement_direction}"
+                              statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                              tag = flex_hour.lower()
+
+                              if hour_type == "HC":
+                                flex_hour = "normal_HC"
+                                cost = value * self.usage_point_id_config.consumption_price_hc / 1000
+                              elif hour_type == "HP":
+                                flex_hour = "normal_HP"
+                                cost = value * self.usage_point_id_config.consumption_price_hp / 1000
+
+                              name = f"{name} {flex_hour} {measurement_direction}"
+                              statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                              tag = flex_hour.lower()
+
                             else:
                               flex_hour = f"{day_flex.lower()}_{hour_type}"
                               name = f"{name} {flex_hour} {measurement_direction}"
