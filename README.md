@@ -1,6 +1,6 @@
-Fork with Flex data in the Homeassistant Dashbord
+# MyElectricalData with EDF Flex on HA Dashboard
 
-# MyElectricalData with EDF Flex
+Fork with Flex data in the Homeassistant Dashboard
 
 ![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield]
 
