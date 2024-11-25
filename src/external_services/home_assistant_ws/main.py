@@ -255,22 +255,20 @@ class HomeAssistantWs:
                                 statistic_id = f"{statistic_id}_{tempo_color.lower()}_{measurement_direction}"
                                 tag = tempo_color.lower()                        
                         elif plan.upper() == "FLEX" :
-                           # Récupérer le statut Flex
+                            # Récupérer le statut Flex
                             db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
                             flex_manager = FlexDayManager(db_flex)
                             hour_type = stats.get_mesure_type(data.date)
                             newstrdate = data.date.strftime("%Y-%m-%d")
-                            
-                            if newstrdate != strdate:
-                              strdate = newstrdate
-                              day_flex = flex_manager.get_flex_status(strdate)
+
+                            # Ajouter une condition pour éviter les requêtes inutiles
+                            if data.date < datetime(2024, 1, 15):
+                                day_flex = "Inconnu"
+                            elif newstrdate != strdate:
+                                strdate = newstrdate
+                                day_flex = flex_manager.get_flex_status(strdate)
 
                             if day_flex == "Inconnu":
-                              logging.error(f"Import impossible, pas de donnée flex sur la date du {data.date}")
-                              name = f"{name} {flex_hour} {measurement_direction}"
-                              statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
-                              tag = flex_hour.lower()
-
                               if hour_type == "HC":
                                 flex_hour = "normal_HC"
                                 cost = value * self.usage_point_id_config.consumption_price_hc / 1000

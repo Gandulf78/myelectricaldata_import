@@ -92,7 +92,7 @@ class ExportInfluxDB:
                         if current_month != date.strftime("%m"):
                             logging.info(f" - {date.strftime('%Y')}-{date.strftime('%m')}")
                         # if len(INFLUXDB.get(start, end, measurement_direction)) == 0:
-                        watt = daily.value
+                        watt = float(daily.value)
                         kwatt = watt / 1000
                         euro = kwatt * price
                         self.influxdb_client.write(

@@ -38,13 +38,15 @@ class DatabaseFlex:
         """Ajoute ou met à jour le statut Flex pour une date donnée."""
         try:
             with self.session.begin():  # Assurer une transaction
+                # Vérification de l'existence d'une entrée pour la date donnée
                 existing_entry = self.session.query(FlexDay).filter_by(date=date).first()
-                if existing_entry:
-                    existing_entry.status = status
+                if not existing_entry:
+                    # Si aucune entrée n'existe, insérer une nouvelle
+                    self.session.add(FlexDay(date=date, status=new_status))
+                    self.session.flush()  # Valider temporairement les changements
                 else:
-                    new_entry = FlexDay(date=date, status=status)
-                    self.session.add(new_entry)
-                self.session.flush()  # Valider temporairement les changements
+                    # Si une entrée existe déjà, ignorer l'insertion
+                    logging.info(f"Une entrée existe déjà pour la date {date}. Aucun changement effectué.")
         except IntegrityError as e:
             logging.error(f"Erreur d'intégrité lors de l'ajout/mise à jour : {e}")
             self.session.rollback()  # Annuler les modifications si erreur

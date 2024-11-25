@@ -130,7 +130,7 @@ class Detail:
                                 # CHANGE DATE TO BEGIN RANGE
                                 date = date_object - timedelta(minutes=int(interval))
                                 if int(value) == 0:
-                                    logging.warning(f" => {date} blacklint incrementation.")
+                                    logging.debug(f" => {date} blacklint incrementation.")
                                     DatabaseDetail(self.usage_point_id, self.measure_type).fail_increment(date)
                                 else:
                                     DatabaseDetail(self.usage_point_id, self.measure_type).insert(
