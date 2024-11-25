@@ -153,19 +153,19 @@ class ExportMqtt:
                         f"{sub_prefix}/thisYear/dateEnd": get_daily_year["end"],
                         f"{sub_prefix}/thisYear/base/Wh": get_daily_year["value"],
                         f"{sub_prefix}/thisYear/base/kWh": round(get_daily_year["value"] / 1000, 2),
-                        f"{sub_prefix}/thisYear/base/euro": round(get_daily_year["value"] / 1000 * price, 2),
+                        f"{sub_prefix}/thisYear/base/euro": round(get_daily_year["value"] / 1000 * float(price), 2),
                         # thisMonth
                         f"{sub_prefix}/thisMonth/dateBegin": get_daily_month["begin"],
                         f"{sub_prefix}/thisMonth/dateEnd": get_daily_month["end"],
                         f"{sub_prefix}/thisMonth/base/Wh": get_daily_month["value"],
                         f"{sub_prefix}/thisMonth/base/kWh": round(get_daily_month["value"] / 1000, 2),
-                        f"{sub_prefix}/thisMonth/base/euro": round(get_daily_month["value"] / 1000 * price, 2),
+                        f"{sub_prefix}/thisMonth/base/euro": round(get_daily_month["value"] / 1000 * float(price), 2),
                         # thisWeek
                         f"{sub_prefix}/thisWeek/dateBegin": get_daily_week["begin"],
                         f"{sub_prefix}/thisWeek/dateEnd": get_daily_week["end"],
                         f"{sub_prefix}/thisWeek/base/Wh": get_daily_week["value"],
                         f"{sub_prefix}/thisWeek/base/kWh": round(get_daily_week["value"] / 1000, 2),
-                        f"{sub_prefix}/thisWeek/base/euro": round(get_daily_week["value"] / 1000 * price, 2),
+                        f"{sub_prefix}/thisWeek/base/euro": round(get_daily_week["value"] / 1000 * float(price), 2),
                     }
 
                     for week in range(7):
@@ -181,7 +181,7 @@ class ExportMqtt:
                         mqtt_data[f"{sub_prefix}/week/{begin_day}/dateEnd"] = end
                         mqtt_data[f"{sub_prefix}/week/{begin_day}/base/Wh"] = value
                         mqtt_data[f"{sub_prefix}/week/{begin_day}/base/kWh"] = round(value / 1000, 2)
-                        mqtt_data[f"{sub_prefix}/week/{begin_day}/base/euro"] = round(value / 1000 * price, 2)
+                        mqtt_data[f"{sub_prefix}/week/{begin_day}/base/euro"] = round(value / 1000 * float(price), 2)
 
                     for month in range(1, 13):
                         get_daily_month = stat.get_month(year=year, month=month)
@@ -190,7 +190,7 @@ class ExportMqtt:
                         mqtt_data[f"{sub_prefix}/month/{month}/base/Wh"] = get_daily_month["value"]
                         mqtt_data[f"{sub_prefix}/month/{month}/base/kWh"] = round(get_daily_month["value"] / 1000, 2)
                         mqtt_data[f"{sub_prefix}/month/{month}/base/euro"] = round(
-                            get_daily_month["value"] / 1000 * price, 2
+                            get_daily_month["value"] / 1000 * float(price), 2
                         )
 
                     if date_begin_current == date_begin:
@@ -232,19 +232,19 @@ class ExportMqtt:
                         f"{sub_prefix}/thisYear/dateEnd": get_daily_year_linear["end"],
                         f"{sub_prefix}/thisYear/base/Wh": get_daily_year_linear["value"],
                         f"{sub_prefix}/thisYear/base/kWh": round(get_daily_year_linear["value"] / 1000, 2),
-                        f"{sub_prefix}/thisYear/base/euro": round(get_daily_year_linear["value"] / 1000 * price, 2),
+                        f"{sub_prefix}/thisYear/base/euro": round(get_daily_year_linear["value"] / 1000 * float(price), 2),
                         # thisMonth
                         f"{sub_prefix}/thisMonth/dateBegin": get_daily_month_linear["begin"],
                         f"{sub_prefix}/thisMonth/dateEnd": get_daily_month_linear["end"],
                         f"{sub_prefix}/thisMonth/base/Wh": get_daily_month_linear["value"],
                         f"{sub_prefix}/thisMonth/base/kWh": round(get_daily_month_linear["value"] / 1000, 2),
-                        f"{sub_prefix}/thisMonth/base/euro": round(get_daily_month_linear["value"] / 1000 * price, 2),
+                        f"{sub_prefix}/thisMonth/base/euro": round(get_daily_month_linear["value"] / 1000 * float(price), 2),
                         # thisWeek
                         f"{sub_prefix}/thisWeek/dateBegin": get_daily_week_linear["begin"],
                         f"{sub_prefix}/thisWeek/dateEnd": get_daily_week_linear["end"],
                         f"{sub_prefix}/thisWeek/base/Wh": get_daily_week_linear["value"],
                         f"{sub_prefix}/thisWeek/base/kWh": round(get_daily_week_linear["value"] / 1000, 2),
-                        f"{sub_prefix}/thisWeek/base/euro": round(get_daily_week_linear["value"] / 1000 * price, 2),
+                        f"{sub_prefix}/thisWeek/base/euro": round(get_daily_week_linear["value"] / 1000 * float(price), 2),
                     }
 
                     # CALCUL NEW DATE
@@ -299,27 +299,27 @@ class ExportMqtt:
                         # thisYear - HP
                         f"{sub_prefix}/thisYear/hp/Wh": get_detail_year_hp["value"],
                         f"{sub_prefix}/thisYear/hp/kWh": round(get_detail_year_hp["value"] / 1000, 2),
-                        f"{sub_prefix}/thisYear/hp/euro": round(get_detail_year_hp["value"] / 1000 * price_hp, 2),
+                        f"{sub_prefix}/thisYear/hp/euro": round(get_detail_year_hp["value"] / 1000 * float(price_hp), 2),
                         # thisYear - HC
                         f"{sub_prefix}/thisYear/hc/Wh": get_detail_year_hc["value"],
                         f"{sub_prefix}/thisYear/hc/kWh": round(get_detail_year_hc["value"] / 1000, 2),
-                        f"{sub_prefix}/thisYear/hc/euro": round(get_detail_year_hc["value"] / 1000 * price_hc, 2),
+                        f"{sub_prefix}/thisYear/hc/euro": round(get_detail_year_hc["value"] / 1000 * float(price_hc), 2),
                         # thisMonth - HP
                         f"{sub_prefix}/thisMonth/hp/Wh": get_detail_month_hp["value"],
                         f"{sub_prefix}/thisMonth/hp/kWh": round(get_detail_month_hp["value"] / 1000, 2),
-                        f"{sub_prefix}/thisMonth/hp/euro": round(get_detail_month_hp["value"] / 1000 * price_hp, 2),
+                        f"{sub_prefix}/thisMonth/hp/euro": round(get_detail_month_hp["value"] / 1000 * float(price_hp), 2),
                         # thisMonth - HC
                         f"{sub_prefix}/thisMonth/hc/Wh": get_detail_month_hc["value"],
                         f"{sub_prefix}/thisMonth/hc/kWh": round(get_detail_month_hc["value"] / 1000, 2),
-                        f"{sub_prefix}/thisMonth/hc/euro": round(get_detail_month_hc["value"] / 1000 * price_hc, 2),
+                        f"{sub_prefix}/thisMonth/hc/euro": round(get_detail_month_hc["value"] / 1000 * float(price_hc), 2),
                         # thisWeek - HP
                         f"{sub_prefix}/thisWeek/hp/Wh": get_detail_week_hp["value"],
                         f"{sub_prefix}/thisWeek/hp/kWh": round(get_detail_week_hp["value"] / 1000, 2),
-                        f"{sub_prefix}/thisWeek/hp/euro": round(get_detail_week_hp["value"] / 1000 * price_hp, 2),
+                        f"{sub_prefix}/thisWeek/hp/euro": round(get_detail_week_hp["value"] / 1000 * float(price_hp), 2),
                         # thisWeek - HC
                         f"{sub_prefix}/thisWeek/hc/Wh": get_detail_week_hc["value"],
                         f"{sub_prefix}/thisWeek/hc/kWh": round(get_detail_week_hc["value"] / 1000, 2),
-                        f"{sub_prefix}/thisWeek/hc/euro": round(get_detail_week_hc["value"] / 1000 * price_hc, 2),
+                        f"{sub_prefix}/thisWeek/hc/euro": round(get_detail_week_hc["value"] / 1000 * float(price_hc), 2),
                     }
 
                     for week in range(7):
@@ -333,7 +333,7 @@ class ExportMqtt:
                         prefix = f"{sub_prefix}/week/{begin_hp_day}/hp"
                         mqtt_data[f"{prefix}/Wh"] = value_hp
                         mqtt_data[f"{prefix}/kWh"] = round(value_hp / 1000, 2)
-                        mqtt_data[f"{prefix}/euro"] = round(value_hp / 1000 * price_hp, 2)
+                        mqtt_data[f"{prefix}/euro"] = round(value_hp / 1000 * float(price_hp), 2)
                         # HC
                         begin_hc_day = (
                             datetime.strptime(stat.detail(week, "HC")["begin"], self.date_format)
@@ -344,7 +344,7 @@ class ExportMqtt:
                         prefix = f"{sub_prefix}/week/{begin_hc_day}/hc"
                         mqtt_data[f"{prefix}/Wh"] = value_hc
                         mqtt_data[f"{prefix}/kWh"] = round(value_hc / 1000, 2)
-                        mqtt_data[f"{prefix}/euro"] = round(value_hc / 1000 * price_hc, 2)
+                        mqtt_data[f"{prefix}/euro"] = round(value_hc / 1000 * float(price_hc), 2)
 
                     for month in range(12):
                         current_month = month + 1
@@ -353,13 +353,13 @@ class ExportMqtt:
                         prefix = f"{sub_prefix}/month/{current_month}/hp"
                         mqtt_data[f"{prefix}/Wh"] = get_detail_month_hp["value"]
                         mqtt_data[f"{prefix}/kWh"] = round(get_detail_month_hp["value"] / 1000, 2)
-                        mqtt_data[f"{prefix}/euro"] = round(get_detail_month_hp["value"] / 1000 * price_hp, 2)
+                        mqtt_data[f"{prefix}/euro"] = round(get_detail_month_hp["value"] / 1000 * float(price_hp), 2)
                         # HC
                         get_detail_month_hc = stat.get_month(year=year, month=current_month, measure_type="HC")
                         prefix = f"{sub_prefix}/month/{current_month}/hc"
                         mqtt_data[f"{prefix}/Wh"] = get_detail_month_hc["value"]
                         mqtt_data[f"{prefix}/kWh"] = round(get_detail_month_hc["value"] / 1000, 2)
-                        mqtt_data[f"{prefix}/euro"] = round(get_detail_month_hc["value"] / 1000 * price_hc, 2)
+                        mqtt_data[f"{prefix}/euro"] = round(get_detail_month_hc["value"] / 1000 * float(price_hc), 2)
                     if date_begin_current == date_begin:
                         finish = True
                     date_end = datetime.combine(
@@ -408,34 +408,34 @@ class ExportMqtt:
                         f"{sub_prefix}/thisYear/hp/Wh": get_daily_year_linear_hp["value"],
                         f"{sub_prefix}/thisYear/hp/kWh": round(get_daily_year_linear_hp["value"] / 1000, 2),
                         f"{sub_prefix}/thisYear/hp/euro": round(
-                            get_daily_year_linear_hp["value"] / 1000 * price_hp, 2
+                            get_daily_year_linear_hp["value"] / 1000 * float(price_hp), 2
                         ),
                         f"{sub_prefix}/thisYear/hc/Wh": get_daily_year_linear_hc["value"],
                         f"{sub_prefix}/thisYear/hc/kWh": round(get_daily_year_linear_hc["value"] / 1000, 2),
                         f"{sub_prefix}/thisYear/hc/euro": round(
-                            get_daily_year_linear_hc["value"] / 1000 * price_hc, 2
+                            get_daily_year_linear_hc["value"] / 1000 * float(price_hc), 2
                         ),
                         # thisMonth
                         f"{sub_prefix}/thisMonth/hp/Wh": get_detail_month_linear_hp["value"],
                         f"{sub_prefix}/thisMonth/hp/kWh": round(get_detail_month_linear_hp["value"] / 1000, 2),
                         f"{sub_prefix}/thisMonth/hp/euro": round(
-                            get_detail_month_linear_hp["value"] / 1000 * price_hp, 2
+                            get_detail_month_linear_hp["value"] / 1000 * float(price_hp), 2
                         ),
                         f"{sub_prefix}/thisMonth/hc/Wh": get_detail_month_linear_hc["value"],
                         f"{sub_prefix}/thisMonth/hc/kWh": round(get_detail_month_linear_hc["value"] / 1000, 2),
                         f"{sub_prefix}/thisMonth/hc/euro": round(
-                            get_detail_month_linear_hc["value"] / 1000 * price_hc, 2
+                            get_detail_month_linear_hc["value"] / 1000 * float(price_hc), 2
                         ),
                         # thisWeek
                         f"{sub_prefix}/thisWeek/hp/Wh": get_detail_week_linear_hp["value"],
                         f"{sub_prefix}/thisWeek/hp/kWh": round(get_detail_week_linear_hp["value"] / 1000, 2),
                         f"{sub_prefix}/thisWeek/hp/euro": round(
-                            get_detail_week_linear_hp["value"] / 1000 * price_hp, 2
+                            get_detail_week_linear_hp["value"] / 1000 * float(price_hp), 2
                         ),
                         f"{sub_prefix}/thisWeek/hc/Wh": get_detail_week_linear_hc["value"],
                         f"{sub_prefix}/thisWeek/hc/kWh": round(get_detail_week_linear_hc["value"] / 1000, 2),
                         f"{sub_prefix}/thisWeek/hc/euro": round(
-                            get_detail_week_linear_hc["value"] / 1000 * price_hc, 2
+                            get_detail_week_linear_hc["value"] / 1000 * float(price_hc), 2
                         ),
                     }
 

@@ -28,25 +28,34 @@ class DatabaseFlex:
         self.session = DB.session()
         Base.metadata.create_all(bind=self.session.get_bind())  # Crée les tables si elles n'existent pas
 
-    def get_flex_day(self, date):
+    def get_flex_day(self, dt):
         """Récupère le statut d'un jour Flex."""
-        query = select(FlexDay).where(FlexDay.date == date)
+        normalized_date = datetime(dt.year, dt.month, dt.day)
+        query = select(FlexDay).where(FlexDay.date == normalized_date)
         result = self.session.scalars(query).one_or_none()
         return result.status if result else None
 
-    def set_flex_day(self, date, status):
+    from datetime import date
+
+    def set_flex_day(self, dt, status):
         """Ajoute ou met à jour le statut Flex pour une date donnée."""
         try:
             with self.session.begin():  # Assurer une transaction
-                # Vérification de l'existence d'une entrée pour la date donnée
-                existing_entry = self.session.query(FlexDay).filter_by(date=date).first()
-                if not existing_entry:
-                    # Si aucune entrée n'existe, insérer une nouvelle
-                    self.session.add(FlexDay(date=date, status=new_status))
-                    self.session.flush()  # Valider temporairement les changements
+                # Normaliser la date pour ne conserver que la partie 'date'
+                normalized_date = datetime(dt.year, dt.month, dt.day)
+
+                logging.info(f"Vérification de l'existence de la date : {normalized_date}")
+                existing_entry = self.session.query(FlexDay).filter_by(date=normalized_date).first()
+
+                if existing_entry:
+                    logging.info(f"Entrée existante trouvée pour la date {normalized_date}, mise à jour du statut.")
+                    existing_entry.status = status  # Mise à jour du statut
                 else:
-                    # Si une entrée existe déjà, ignorer l'insertion
-                    logging.info(f"Une entrée existe déjà pour la date {date}. Aucun changement effectué.")
+                    logging.info(
+                        f"Aucune entrée existante pour la date {normalized_date}, insertion d'une nouvelle entrée.")
+                    self.session.add(FlexDay(date=normalized_date, status=status))
+
+                self.session.commit()  # Commit des changements
         except IntegrityError as e:
             logging.error(f"Erreur d'intégrité lors de l'ajout/mise à jour : {e}")
             self.session.rollback()  # Annuler les modifications si erreur

@@ -94,7 +94,7 @@ class ExportInfluxDB:
                         # if len(INFLUXDB.get(start, end, measurement_direction)) == 0:
                         watt = float(daily.value)
                         kwatt = watt / 1000
-                        euro = kwatt * price
+                        euro = kwatt * float(price)
                         self.influxdb_client.write(
                             measurement=measurement_direction,
                             date=self.tz.localize(date),
