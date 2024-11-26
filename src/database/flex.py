@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import Column, String, Date, select
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.exc import IntegrityError
@@ -30,35 +30,30 @@ class DatabaseFlex:
 
     def get_flex_day(self, dt):
         """Récupère le statut d'un jour Flex."""
-        normalized_date = datetime(dt.year, dt.month, dt.day)
+        normalized_date = datetime(dt.year, dt.month, dt.day).date()
         query = select(FlexDay).where(FlexDay.date == normalized_date)
         result = self.session.scalars(query).one_or_none()
         return result.status if result else None
 
-    from datetime import date
-
     def set_flex_day(self, dt, status):
         """Ajoute ou met à jour le statut Flex pour une date donnée."""
         try:
-            with self.session.begin():  # Assurer une transaction
-                # Normaliser la date pour ne conserver que la partie 'date'
-                normalized_date = datetime(dt.year, dt.month, dt.day)
+            # Normaliser la date pour ne conserver que la partie 'date'
+            normalized_date = datetime(dt.year, dt.month, dt.day).date()
 
-                logging.info(f"Vérification de l'existence de la date : {normalized_date}")
-                existing_entry = self.session.query(FlexDay).filter_by(date=normalized_date).first()
-
-                if existing_entry:
-                    logging.info(f"Entrée existante trouvée pour la date {normalized_date}, mise à jour du statut.")
-                    existing_entry.status = status  # Mise à jour du statut
-                else:
-                    logging.info(
-                        f"Aucune entrée existante pour la date {normalized_date}, insertion d'une nouvelle entrée.")
-                    self.session.add(FlexDay(date=normalized_date, status=status))
-
-                self.session.commit()  # Commit des changements
-        except IntegrityError as e:
-            logging.error(f"Erreur d'intégrité lors de l'ajout/mise à jour : {e}")
-            self.session.rollback()  # Annuler les modifications si erreur
+            logging.info(f"Vérification de l'existence de la date : {normalized_date}")
+            
+            # Utiliser merge au lieu de add pour gérer à la fois l'insertion et la mise à jour
+            flex_day = FlexDay(date=normalized_date, status=status)
+            self.session.merge(flex_day)
+            self.session.commit()
+            
+            logging.info(f"Statut Flex enregistré pour la date {normalized_date}: {status}")
+            
+        except Exception as e:
+            logging.error(f"Erreur lors de l'ajout/mise à jour : {e}")
+            self.session.rollback()
+            raise
 
     def get_flex_config(self, key):
         """Récupère la valeur d'une clé de configuration Flex."""

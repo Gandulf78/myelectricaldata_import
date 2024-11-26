@@ -3,6 +3,7 @@ import inspect
 import json
 import logging
 import ssl
+import time
 import traceback
 from datetime import datetime, timedelta
 
@@ -28,17 +29,20 @@ class HomeAssistantWs:
         Args:
             usage_point_id (str): The usage point id
         """
-        self.websocket: websocket.WebSocket = None
+        self.websocket = None
         self.usage_point_id = usage_point_id
         self.usage_point_id_config: UsagePointId = APP_CONFIG.myelectricaldata.usage_point_config[self.usage_point_id]
         self.id = 1
         self.purge_force = False
         self.current_stats = []
+        self.max_retries = 3
+        self.retry_delay = 5  # seconds
+        
         if self.connect():
             self.import_data()
         else:
             logging.critical("La configuration Home Assistant WebSocket est erronée")
-        if self.websocket.connected:
+        if self.websocket and self.websocket.connected:
             self.websocket.close()
 
     def connect(self):
@@ -55,7 +59,12 @@ class HomeAssistantWs:
                     sslopt = {"cert_reqs": ssl.CERT_NONE}
                     prefix = "wss"
                 self.uri = f"{prefix}://{APP_CONFIG.home_assistant_ws.url}/api/websocket"
+                
+                # Enable ping/pong to keep connection alive
                 self.websocket = websocket.WebSocket(sslopt=sslopt)
+                self.websocket.ping_interval = 30
+                self.websocket.ping_timeout = 10
+                
                 logging.info("Connexion au WebSocket Home Assistant %s", self.uri)
                 self.websocket.connect(self.uri, timeout=5)
                 output = json.loads(self.websocket.recv())
@@ -63,16 +72,33 @@ class HomeAssistantWs:
                     logging.info("Authentification requise")
                     return self.authentificate()
                 return True
-            except Exception as _e:
-                self.websocket.close()
+            except Exception as e:
+                if self.websocket:
+                    self.websocket.close()
                 logging.error(
                     f"""
-    Impossible de se connecter au WebSocket Home Assistant.
+    Impossible de se connecter au WebSocket Home Assistant: {str(e)}
 
     Vous pouvez récupérer un exemple ici :
 {URL_CONFIG_FILE}
 """
                 )
+                return False
+
+    def ensure_connection(self):
+        """Ensure the WebSocket connection is active, attempt to reconnect if not.
+        
+        Returns:
+            bool: True if connection is active or successfully reconnected
+        """
+        if not self.websocket or not self.websocket.connected:
+            for attempt in range(self.max_retries):
+                logging.warning(f"Tentative de reconnexion ({attempt + 1}/{self.max_retries})...")
+                if self.connect() and self.authentificate():
+                    return True
+                time.sleep(self.retry_delay)
+            return False
+        return True
 
     def authentificate(self):
         """Authenticate with the Home Assistant WebSocket server.
@@ -98,14 +124,23 @@ class HomeAssistantWs:
             dict: The output from the server
         """
         with APP_CONFIG.tracer.start_as_current_span(f"{__name__}.{inspect.currentframe().f_code.co_name}"):
-            self.websocket.send(json.dumps(data))
-            self.id = self.id + 1
-            output = json.loads(self.websocket.recv())
-            if "type" in output and output["type"] == "result":
-                if not output["success"]:
-                    logging.error(f"Erreur d'envoi : {data}")
-                    logging.error(output)
-            return output
+            if not self.ensure_connection():
+                raise ConnectionError("Impossible de maintenir la connexion WebSocket")
+            
+            try:
+                self.websocket.send(json.dumps(data))
+                self.id = self.id + 1
+                output = json.loads(self.websocket.recv())
+                if "type" in output and output["type"] == "result":
+                    if not output["success"]:
+                        logging.error(f"Erreur d'envoi : {data}")
+                        logging.error(output)
+                return output
+            except (websocket.WebSocketConnectionClosedException, ConnectionError) as e:
+                logging.error(f"Erreur de connexion lors de l'envoi: {str(e)}")
+                if self.ensure_connection():
+                    return self.send(data)  # Retry once if reconnection successful
+                raise
 
     def list_data(self):
         """List the data already cached in Home Assistant.
