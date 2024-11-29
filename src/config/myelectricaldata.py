@@ -16,7 +16,8 @@ class Plan:
         self.hchp: str = "HC/HP"
         self.tempo: str = "TEMPO"
         self.flex: str = "FLEX"
-        
+
+
 class UsagePointId:
     """UsagePoint templates."""
 
@@ -36,6 +37,12 @@ class UsagePointId:
         self._consumption_max_power: bool = None
         self._consumption_price_hc: float = None
         self._consumption_price_hp: float = None
+        self._consumption_price_flex_normal_hc: float = None
+        self._consumption_price_flex_normal_hp: float = None
+        self._consumption_price_flex_sobriete_hc: float = None
+        self._consumption_price_flex_sobriete_hp: float = None
+        self._consumption_price_flex_bonus_hc: float = None
+        self._consumption_price_flex_bonus_hp: float = None
         self._consumption_price_base: float = None
         self._consumption_max_date: str = None
         self._consumption_detail_max_date: str = None

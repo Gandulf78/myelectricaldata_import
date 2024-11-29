@@ -127,6 +127,41 @@ class DatabaseUsagePoints:
         self.session.flush()
         self.session.close()
 
+    def set_data(self, usage_point_data):
+        """Set usage point data in the database.
+        
+        Args:
+            usage_point_data: The usage point data to store.
+        """
+        usage_point = UsagePoints(
+            usage_point_id=self.usage_point_id,
+            enable=usage_point_data.enable,
+            name=usage_point_data.name,
+            token=usage_point_data.token,
+            cache=usage_point_data.cache,
+            consumption=usage_point_data.consumption,
+            consumption_detail=usage_point_data.consumption_detail,
+            consumption_price_base=usage_point_data.consumption_price_base,
+            consumption_price_hc=usage_point_data.consumption_price_hc,
+            consumption_price_hp=usage_point_data.consumption_price_hp,
+            consumption_max_power=usage_point_data.consumption_max_power,
+            production=usage_point_data.production,
+            production_detail=usage_point_data.production_detail,
+            production_price=usage_point_data.production_price,
+            offpeak_hours_0=usage_point_data.offpeak_hours_0,
+            offpeak_hours_1=usage_point_data.offpeak_hours_1,
+            offpeak_hours_2=usage_point_data.offpeak_hours_2,
+            offpeak_hours_3=usage_point_data.offpeak_hours_3,
+            offpeak_hours_4=usage_point_data.offpeak_hours_4,
+            offpeak_hours_5=usage_point_data.offpeak_hours_5,
+            offpeak_hours_6=usage_point_data.offpeak_hours_6,
+            plan=usage_point_data.plan,
+            refresh_addresse=usage_point_data.refresh_addresse,
+            refresh_contract=usage_point_data.refresh_contract
+        )
+        self.session.merge(usage_point)
+        self.session.commit()
+
     def progress(self, increment):
         """Update progress in database."""
         query = select(UsagePoints).where(UsagePoints.usage_point_id == self.usage_point_id)

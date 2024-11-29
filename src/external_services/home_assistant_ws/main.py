@@ -290,51 +290,60 @@ class HomeAssistantWs:
                                 statistic_id = f"{statistic_id}_{tempo_color.lower()}_{measurement_direction}"
                                 tag = tempo_color.lower()                        
                         elif plan.upper() == "FLEX" :
-                            # Récupérer le statut Flex
-                            db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
-                            flex_manager = FlexDayManager(db_flex)
-                            hour_type = stats.get_mesure_type(data.date)
-                            newstrdate = data.date.strftime("%Y-%m-%d")
+                            # Check if we should use BASE tariff based on date
+                            tariff_change_date = datetime.strptime(self.usage_point_id_config.tariff_change_date, "%Y-%m-%d") if hasattr(self.usage_point_id_config, "tariff_change_date") else None
 
-                            # Ajouter une condition pour éviter les requêtes inutiles
-                            if data.date < datetime(2024, 1, 15):
-                                day_flex = "Inconnu"
-                            elif newstrdate != strdate:
-                                strdate = newstrdate
-                                day_flex = flex_manager.get_flex_status(strdate)
-
-                            if day_flex == "Inconnu":
-                              if hour_type == "HC":
-                                flex_hour = "normal_HC"
-                                cost = value * self.usage_point_id_config.consumption_price_hc / 1000
-                              elif hour_type == "HP":
+                            if tariff_change_date and data.date < tariff_change_date:
+                                # Use BASE tariff pricing with normal_HP for all consumption
                                 flex_hour = "normal_HP"
-                                cost = value * self.usage_point_id_config.consumption_price_hp / 1000
-
-                              name = f"{name} {flex_hour} {measurement_direction}"
-                              statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
-                              tag = flex_hour.lower()
-
+                                cost = value * self.usage_point_id_config.consumption_price_base / 1000
+                                name = f"{name} {flex_hour} {measurement_direction}"
+                                statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                                tag = flex_hour.lower()
                             else:
-                              flex_hour = f"{day_flex.lower()}_{hour_type}"
-                              name = f"{name} {flex_hour} {measurement_direction}"
-                              statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
-                              tag = flex_hour.lower()
-                                                          
-                              if flex_hour == "normal_HC":
-                                cost = value * self.usage_point_id_config.consumption_price_flex_normal_hc / 1000
-                              elif flex_hour == "normal_HP":
-                                cost = value * self.usage_point_id_config.consumption_price_flex_normal_hp / 1000    
-                              elif flex_hour == "sobriete_HC":
-                                cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hc / 1000
-                              elif flex_hour == "sobriete_HP":
-                                cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hp / 1000                           
-                              elif flex_hour == "bonus_HC":
-                                cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hc / 1000                           
-                              elif flex_hour == "bonus_HP":
-                                cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hp / 1000     
-                              else:
-                                cost = 0.0                                                                                
+                                # Use FLEX tariff logic
+                                # Récupérer le statut Flex
+                                db_flex = DatabaseFlex()  # Utilise la session de DB par défaut
+                                flex_manager = FlexDayManager(db_flex)
+                                hour_type = stats.get_mesure_type(data.date)
+                                newstrdate = data.date.strftime("%Y-%m-%d")
+
+                                if newstrdate != strdate:
+                                    strdate = newstrdate
+                                    day_flex = flex_manager.get_flex_status(strdate)
+
+                                if day_flex == "Inconnu":
+                                  if hour_type == "HC":
+                                    flex_hour = "normal_HC"
+                                    cost = value * self.usage_point_id_config.consumption_price_hc / 1000
+                                  elif hour_type == "HP":
+                                    flex_hour = "normal_HP"
+                                    cost = value * self.usage_point_id_config.consumption_price_hp / 1000
+
+                                  name = f"{name} {flex_hour} {measurement_direction}"
+                                  statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                                  tag = flex_hour.lower()
+
+                                else:
+                                  flex_hour = f"{day_flex.lower()}_{hour_type}"
+                                  name = f"{name} {flex_hour} {measurement_direction}"
+                                  statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
+                                  tag = flex_hour.lower()
+                                                      
+                                  if flex_hour == "normal_HC":
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_normal_hc / 1000
+                                  elif flex_hour == "normal_HP":
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_normal_hp / 1000    
+                                  elif flex_hour == "sobriete_HC":
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hc / 1000
+                                  elif flex_hour == "sobriete_HP":
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hp / 1000                           
+                                  elif flex_hour == "bonus_HC":
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hc / 1000                           
+                                  elif flex_hour == "bonus_HP":
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hp / 1000     
+                                  else:
+                                    cost = 0.0                                                                                
                         else:
                             logging.error(f"Plan {plan} inconnu.")
 
