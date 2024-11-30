@@ -60,6 +60,8 @@ class UsagePointId:
         self._offpeak_hours_6: str = None
         self._refresh_addresse: bool = None
         self._refresh_contract: bool = None
+        self._tariff_change_date: str = None
+        self._previous_tariff: str = None
         # PROPERTIES
         self.key: str = "myelectricaldata"
         self.json: dict = {}
@@ -102,6 +104,8 @@ class UsagePointId:
             "offpeak_hours_6": "",
             "refresh_addresse": False,
             "refresh_contract": False,
+            "tariff_change_date": "",
+            "previous_tariff": "BASE",
         }
 
     def load(self):  # noqa: C901, PLR0912, PLR0915
@@ -282,6 +286,16 @@ class UsagePointId:
             self.change(sub_key, str2bool(self.config[self.key][self.usage_point_id][sub_key]), False)
         except Exception:
             self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "tariff_change_date"
+            self.change(sub_key, self.config[self.key][self.usage_point_id][sub_key], False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+        try:
+            sub_key = "previous_tariff"
+            self.change(sub_key, self.config[self.key][self.usage_point_id][sub_key], False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
 
         # Save configuration
         if self.write:
@@ -301,6 +315,7 @@ class UsagePointId:
                 "consumption_detail_max_date",
                 "production_max_date",
                 "production_detail_max_date",
+                "tariff_change_date",
             ]:
                 return datetime.strptime(value, "%Y-%m-%d").replace(tzinfo=TIMEZONE_UTC)
             return value
@@ -619,6 +634,24 @@ class UsagePointId:
 
     @refresh_contract.setter
     def refresh_contract(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def tariff_change_date(self) -> str:
+        """Tariff change date."""
+        return self._tariff_change_date
+
+    @tariff_change_date.setter
+    def tariff_change_date(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def previous_tariff(self) -> str:
+        """Previous tariff."""
+        return self._previous_tariff
+
+    @previous_tariff.setter
+    def previous_tariff(self, value):
         self.change(inspect.currentframe().f_code.co_name, value)
 
 

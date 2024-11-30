@@ -1,7 +1,7 @@
 """Add tariff_change_date to UsagePoints
 
-Revision ID: add_tariff_change_date
-Revises: initial_schema
+Revision ID: f600b59e8a0d
+Revises: e990284249e4
 Create Date: 2024-01-15
 
 """
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'add_tariff_change_date'
-down_revision = 'initial_schema'
+revision = 'f600b59e8a0d'
+down_revision = 'e990284249e4'
 branch_labels = None
 depends_on = None
 

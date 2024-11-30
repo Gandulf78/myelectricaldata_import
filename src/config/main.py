@@ -305,5 +305,7 @@ class Config:
             logging.debug("[OpenTelemetry] FastAPI loaded")
             FastAPIInstrumentor.instrument_app(app)
 
-if __name__ == "config.main":
-    APP_CONFIG = Config()
+APP_CONFIG = Config()
+
+if __name__ == "__main__":
+    pass

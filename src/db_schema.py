@@ -76,6 +76,7 @@ class UsagePoints(Base):
     consumption_max_power = Column(Boolean, nullable=False, default=True)
     last_error = Column(Text, nullable=True)
     tariff_change_date = Column(DateTime, nullable=True)
+    previous_tariff = Column(String, nullable=True)
 
     relation_addressess = relationship("Addresses", back_populates="usage_point")
     relation_contract = relationship("Contracts", back_populates="usage_point")
@@ -135,6 +136,7 @@ class UsagePoints(Base):
             f"production_detail_max_date={self.production_detail_max_date!r}, "
             f"last_error={self.last_error!r}, "
             f"tariff_change_date={self.tariff_change_date!r}, "
+            f"previous_tariff={self.previous_tariff!r}, "
             f")"
         )
 
