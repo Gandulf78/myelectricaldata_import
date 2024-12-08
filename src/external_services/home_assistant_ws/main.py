@@ -5,9 +5,9 @@ import logging
 import ssl
 import time
 import traceback
-from datetime import datetime, timedelta
-
 import websocket
+
+from datetime import datetime, timedelta
 
 from config.main import APP_CONFIG
 from config.myelectricaldata import UsagePointId
@@ -382,7 +382,9 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
-                                
+                        # Add monthly charge to cost
+                        daily_charge = detail.daily_charge if hasattr(detail, 'daily_charge') else 0
+                        cost += daily_charge
                         stats_euro[statistic_id]["tag"] = tag
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost
@@ -532,6 +534,9 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
+                        # Add monthly charge to cost
+                        daily_charge = detail.daily_charge if hasattr(detail, 'daily_charge') else 0
+                        cost += daily_charge
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost
                         stats_euro[statistic_id]["data"][key]["sum"] = stats_euro[statistic_id]["sum"]

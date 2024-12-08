@@ -242,6 +242,7 @@ class ConsumptionDaily(Base):
     value = Column(Integer, nullable=False)
     blacklist = Column(Integer, nullable=False, default=0)
     fail_count = Column(Integer, nullable=False, default=0)
+    daily_charge = Column(Float, nullable=True, default=0)
 
     usage_point = relationship("UsagePoints", back_populates="relation_consumption_daily")
 
@@ -254,7 +255,8 @@ class ConsumptionDaily(Base):
             f"date={self.date!r}, "
             f"value={self.value!r}, "
             f"blacklist={self.blacklist!r}, "
-            f"fail_count={self.fail_count!r}"
+            f"fail_count={self.fail_count!r}, "
+            f"daily_charge={self.daily_charge!r}"
             f")"
         )
 

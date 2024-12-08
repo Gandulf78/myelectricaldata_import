@@ -87,6 +87,7 @@ myelectricaldata:
     offpeak_hours_6: ''
     refresh_addresse: false
     refresh_contract: false
+    monthly_charge: 15.0
 opentelemetry:
   enable: false
   service_name: myelectricaldata
