@@ -34,10 +34,6 @@ RUN apt-get update && \
         ./rust-1.78.0-arm-unknown-linux-gnueabi/install.sh; \
     fi
 
-# Install Rust and Cargo
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-
 # Copy application code and install requirements
 COPY ./src /app
 RUN pip install --no-cache-dir -r /app/requirements.txt

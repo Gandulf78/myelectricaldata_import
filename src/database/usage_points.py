@@ -42,6 +42,7 @@ class UsagePointsConfig:  # pylint: disable=R0902
         self.consumption_price_flex_sobriete_hp: float = 0
         self.consumption_price_flex_bonus_hc: float = 0
         self.consumption_price_flex_bonus_hp: float = 0
+        self.monthly_charge: float = 0
         self.consumption_max_power: bool = True
         self.production: bool = False
         self.production_detail: bool = False
@@ -157,7 +158,8 @@ class DatabaseUsagePoints:
             offpeak_hours_6=usage_point_data.offpeak_hours_6,
             plan=usage_point_data.plan,
             refresh_addresse=usage_point_data.refresh_addresse,
-            refresh_contract=usage_point_data.refresh_contract
+            refresh_contract=usage_point_data.refresh_contract,
+            monthly_charge=usage_point_data.monthly_charge
         )
         self.session.merge(usage_point)
         self.session.commit()

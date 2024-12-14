@@ -140,7 +140,7 @@ class Config:
                 key = str(diff.replace("root", "")[2:-2]).replace("']['", ".")
                 found += f"\n - myelectricaldata.{usage_point_id}.{key}"
         if found:
-            logging.critical(f"\nDes valeurs inutiles ont étaient détectées dans le fichier de configuration :{found}")
+            logging.critical(f"\nDes valeurs inutiles ont été détectées dans le fichier de configuration :{found}")
             logging.critical(
                 f"""
     Impossible de charger le fichier de configuration.

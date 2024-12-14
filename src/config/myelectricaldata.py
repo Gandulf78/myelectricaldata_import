@@ -106,6 +106,7 @@ class UsagePointId:
             "refresh_contract": False,
             "tariff_change_date": "",
             "previous_tariff": "BASE",
+            "monthly_charge": 0
         }
 
     def load(self):  # noqa: C901, PLR0912, PLR0915
@@ -296,7 +297,12 @@ class UsagePointId:
             self.change(sub_key, self.config[self.key][self.usage_point_id][sub_key], False)
         except Exception:
             self.change(sub_key, self.default()[sub_key], False)
-
+        try:
+            sub_key = "monthly_charge"
+            self.change(sub_key, self.config[self.key][self.usage_point_id][sub_key], False)
+        except Exception:
+            self.change(sub_key, self.default()[sub_key], False)
+            
         # Save configuration
         if self.write:
             edit_config({self.key: {self.usage_point_id: self.json}})
