@@ -37,23 +37,18 @@ class DatabaseFlex:
 
     def set_flex_day(self, dt, status):
         """Ajoute ou met à jour le statut Flex pour une date donnée."""
+        # Normaliser la date pour ne conserver que la partie 'date'
+        normalized_date = datetime(dt.year, dt.month, dt.day).date()
+        logging.info(f"Vérification de l'existence de la date : {normalized_date}")
         try:
-            # Normaliser la date pour ne conserver que la partie 'date'
-            normalized_date = datetime(dt.year, dt.month, dt.day).date()
-
-            logging.info(f"Vérification de l'existence de la date : {normalized_date}")
-            
-            # Utiliser merge au lieu de add pour gérer à la fois l'insertion et la mise à jour
-            flex_day = FlexDay(date=normalized_date, status=status)
-            self.session.merge(flex_day)
-            self.session.commit()
-            
-            logging.info(f"Statut Flex enregistré pour la date {normalized_date}: {status}")
+            with self.session.begin():
+                # Utiliser merge au lieu de add pour gérer à la fois l'insertion et la mise à jour
+                flex_day = FlexDay(date=normalized_date, status=status)
+                self.session.merge(flex_day)
+                logging.info(f"Statut Flex enregistré pour la date {normalized_date}: {status}")
             
         except Exception as e:
             logging.error(f"Erreur lors de l'ajout/mise à jour : {e}")
-            self.session.rollback()
-            raise
 
     def get_flex_config(self, key):
         """Récupère la valeur d'une clé de configuration Flex."""
