@@ -334,10 +334,6 @@ class DatabaseDaily:
             daily.value = value
             daily.blacklist = blacklist
             daily.fail_count = fail_count
-            # Add monthly charge to daily record
-            if config is not None and hasattr(config, 'monthly_charge'):
-                monthly_charge = float(config.monthly_charge)
-                daily.daily_charge = monthly_charge * 12 / 365  # Prorated daily charge
         else:
             self.session.add(
                 self.table(
@@ -347,7 +343,6 @@ class DatabaseDaily:
                     value=value,
                     blacklist=blacklist,
                     fail_count=fail_count,
-                    daily_charge=0,
                 )
             )
         self.session.flush()

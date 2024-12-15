@@ -207,6 +207,16 @@ class HomeAssistantWs:
 
     def import_data(self):  # noqa: C901, PLR0915
         """Import the data for the usage point into Home Assistant."""
+        # Check and parse tariff_change_date
+        if hasattr(self.usage_point_id_config, "tariff_change_date") and self.usage_point_id_config.tariff_change_date:
+            try:
+                tariff_change_date = datetime.strptime(self.usage_point_id_config.tariff_change_date, "%Y-%m-%d")
+            except ValueError as e:
+                logging.error(f"Invalid date format for tariff_change_date: {self.usage_point_id_config.tariff_change_date}. Error: {e}")
+                tariff_change_date = None
+        else:
+            tariff_change_date = None
+
         with APP_CONFIG.tracer.start_as_current_span(f"{__name__}.{inspect.currentframe().f_code.co_name}"):
             logging.info(f"Point de livraison : {self.usage_point_id}")
             try:
@@ -237,6 +247,7 @@ class HomeAssistantWs:
                     stats = Stat(usage_point_id=self.usage_point_id, measurement_direction="consumption")
                     strdate = ""
                     day_flex = "Inconnu"
+                    hourly_charge = self.usage_point_id_config.monthly_charge * 12 / 365 / 24
                     
                     for data in detail:
                         year = int(f'{data.date.strftime("%Y")}')
@@ -382,9 +393,8 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
-                        # Add monthly charge to cost
-                        daily_charge = detail.daily_charge if hasattr(detail, 'daily_charge') else 0
-                        cost += daily_charge
+                        # Add charge to cost
+                        cost += hourly_charge
                         stats_euro[statistic_id]["tag"] = tag
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost
@@ -534,9 +544,6 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
-                        # Add monthly charge to cost
-                        daily_charge = detail.daily_charge if hasattr(detail, 'daily_charge') else 0
-                        cost += daily_charge
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost
                         stats_euro[statistic_id]["data"][key]["sum"] = stats_euro[statistic_id]["sum"]

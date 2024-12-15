@@ -62,6 +62,7 @@ class UsagePointId:
         self._refresh_contract: bool = None
         self._tariff_change_date: str = None
         self._previous_tariff: str = None
+        self._monthly_charge: float = None
         # PROPERTIES
         self.key: str = "myelectricaldata"
         self.json: dict = {}
@@ -302,7 +303,7 @@ class UsagePointId:
             self.change(sub_key, self.config[self.key][self.usage_point_id][sub_key], False)
         except Exception:
             self.change(sub_key, self.default()[sub_key], False)
-            
+
         # Save configuration
         if self.write:
             edit_config({self.key: {self.usage_point_id: self.json}})
@@ -658,6 +659,15 @@ class UsagePointId:
 
     @previous_tariff.setter
     def previous_tariff(self, value):
+        self.change(inspect.currentframe().f_code.co_name, value)
+
+    @property
+    def monthly_charge(self) -> str:
+        """monthly_charge."""
+        return self._monthly_charge
+
+    @monthly_charge.setter
+    def monthly_charge(self, value):
         self.change(inspect.currentframe().f_code.co_name, value)
 
 

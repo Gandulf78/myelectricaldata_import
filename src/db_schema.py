@@ -77,6 +77,7 @@ class UsagePoints(Base):
     last_error = Column(Text, nullable=True)
     tariff_change_date = Column(DateTime, nullable=True)
     previous_tariff = Column(String, nullable=True)
+    monthly_charge = Column(Float, nullable=False, default=0)
 
     relation_addressess = relationship("Addresses", back_populates="usage_point")
     relation_contract = relationship("Contracts", back_populates="usage_point")
@@ -137,6 +138,7 @@ class UsagePoints(Base):
             f"last_error={self.last_error!r}, "
             f"tariff_change_date={self.tariff_change_date!r}, "
             f"previous_tariff={self.previous_tariff!r}, "
+            f"monthly_charge={self.monthly_charge!r}, "
             f")"
         )
 
@@ -242,7 +244,6 @@ class ConsumptionDaily(Base):
     value = Column(Integer, nullable=False)
     blacklist = Column(Integer, nullable=False, default=0)
     fail_count = Column(Integer, nullable=False, default=0)
-    daily_charge = Column(Float, nullable=True, default=0)
 
     usage_point = relationship("UsagePoints", back_populates="relation_consumption_daily")
 
@@ -256,7 +257,7 @@ class ConsumptionDaily(Base):
             f"value={self.value!r}, "
             f"blacklist={self.blacklist!r}, "
             f"fail_count={self.fail_count!r}, "
-            f"daily_charge={self.daily_charge!r}"
+            f"monthly_charge={self.monthly_charge!r}"
             f")"
         )
 
