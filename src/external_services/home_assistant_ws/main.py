@@ -6,6 +6,7 @@ import ssl
 import time
 import traceback
 import websocket
+import calendar
 
 from datetime import datetime, timedelta
 
@@ -247,8 +248,10 @@ class HomeAssistantWs:
                     stats = Stat(usage_point_id=self.usage_point_id, measurement_direction="consumption")
                     strdate = ""
                     day_flex = "Inconnu"
-                    hourly_charge = self.usage_point_id_config.monthly_charge * 12 / 365 / 24
-                    
+
+                    first_time_slot = None
+                    daily_charge = 0
+
                     for data in detail:
                         year = int(f'{data.date.strftime("%Y")}')
                         if last_year is None or year != last_year:
@@ -256,13 +259,27 @@ class HomeAssistantWs:
                         month = int(f'{data.date.strftime("%m")}')
                         if last_month is None or month != last_month:
                             logging.info(f"    * {month}")
+                        day = int(f'{data.date.strftime("%d")}')    
                         last_year = year
                         last_month = month
                         hour_minute = int(f'{data.date.strftime("%H")}{data.date.strftime("%M")}')
+
+                        # Check if it's the first time slot of the day
+                        if first_time_slot is None or (year, month, day) != (last_year, last_month, last_day):
+                            first_time_slot = data
+                            last_day =  day
+                        # Calculate daily charge based on the first time slot
+                        if data == first_time_slot:
+                            num_days_in_month = calendar.monthrange(year, month)[1]
+                            daily_charge = self.usage_point_id_config.monthly_charge / num_days_in_month
+                        else:
+                            daily_charge = 0
+
                         name = f"MyElectricalData - {self.usage_point_id}"
                         statistic_id = f"myelectricaldata:{self.usage_point_id}"
                         day_interval = data.interval if hasattr(data, "interval") and data.interval != 0 else 1
-                        value = data.value / (60 / day_interval)
+                        value = data.value / (60 / day_interval)                     
+                        
                         tag = None
                         if plan == "BASE":
                             name = f"{name} {plan} {measurement_direction}"
@@ -394,7 +411,7 @@ class HomeAssistantWs:
                                 "sum": 0,
                             }
                         # Add charge to cost
-                        cost += hourly_charge
+                        cost += daily_charge
                         stats_euro[statistic_id]["tag"] = tag
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost
