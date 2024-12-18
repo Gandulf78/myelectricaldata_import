@@ -395,7 +395,7 @@ class HomeAssistantWs:
                         stats_kwh[statistic_id]["tag"] = tag
                         stats_kwh[statistic_id]["sum"] += value
                         stats_kwh[statistic_id]["data"][key]["sum"] = stats_kwh[statistic_id]["sum"]
-
+                        
                         # EURO
                         statistic_id = f"{statistic_id}_cost"
                         if statistic_id not in stats_euro:
@@ -410,12 +410,52 @@ class HomeAssistantWs:
                                 "state": 0,
                                 "sum": 0,
                             }
-                        # Add charge to cost
-                        cost += daily_charge
+
                         stats_euro[statistic_id]["tag"] = tag
                         stats_euro[statistic_id]["data"][key]["state"] += cost
                         stats_euro[statistic_id]["sum"] += cost
                         stats_euro[statistic_id]["data"][key]["sum"] = stats_euro[statistic_id]["sum"]
+                        
+                        if daily_charge > 0:
+                            # fake kwh consumption for charges
+                            name_radical = f"MyElectricalData - {self.usage_point_id}"
+                            name_charge = f"{name_radical} charge"
+
+                            statistic_id_charge = f"myelectricaldata:{self.usage_point_id}_charge"
+                            if statistic_id_charge not in stats_kwh:
+                                stats_kwh[statistic_id_charge] = {"name": name_charge, "sum": 0, "data": {}}
+                            if key not in stats_kwh[statistic_id_charge]["data"]:
+                                stats_kwh[statistic_id_charge]["data"][key] = {
+                                    "start": date.isoformat(),
+                                    "state": 0,
+                                    "sum": 0,
+                                }
+                            stats_kwh[statistic_id_charge]["data"][key]["state"] = 0
+                            stats_kwh[statistic_id_charge]["tag"] = "charge"
+                            stats_kwh[statistic_id_charge]["sum"] = 0
+                            stats_kwh[statistic_id_charge]["data"][key]["sum"] = 0
+
+                            # charge cost                      
+                            statistic_id_charge_cost = f"{statistic_id_charge}_cost"
+                            if statistic_id_charge_cost not in stats_euro:
+                                stats_euro[statistic_id_charge_cost] = {
+                                    "name": f"{name_charge} Cost",
+                                    "sum": 0,
+                                    "data": {},
+                                }
+                            if key not in stats_euro[statistic_id_charge_cost]["data"]:
+                                stats_euro[statistic_id_charge_cost]["data"][key] = {
+                                    "start": date.isoformat(),
+                                    "state": 0,
+                                    "sum": 0,
+                                }
+
+                            # Add charge to cost
+
+                            stats_euro[statistic_id_charge_cost]["tag"] = "charge"
+                            stats_euro[statistic_id_charge_cost]["data"][key]["state"] = stats_euro[statistic_id_charge_cost]["data"][key]["state"] + daily_charge
+                            stats_euro[statistic_id_charge_cost]["sum"] += daily_charge
+                            stats_euro[statistic_id_charge_cost]["data"][key]["sum"] = stats_euro[statistic_id_charge_cost]["sum"]
 
                     # CLEAN OLD DATA
                     if APP_CONFIG.home_assistant_ws.purge or self.purge_force:

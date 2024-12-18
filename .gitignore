@@ -12,3 +12,7 @@ data
 **/__pycache__/
 MED Import.session.sql
 .DS_Store
+/myelectricaldata_import.code-workspace
+alembic.ini
+docker-compose.yaml
+alembic.ini
