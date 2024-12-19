@@ -341,6 +341,7 @@ class HomeAssistantWs:
                                     day_flex = flex_manager.get_flex_status(strdate)
 
                                 if day_flex == "Inconnu":
+                                  logging.info(f"Day flex : Inconnu {strdate}")
                                   if hour_type == "HC":
                                     flex_hour = "normal_HC"
                                     cost = value * self.usage_point_id_config.consumption_price_hc / 1000
@@ -357,19 +358,25 @@ class HomeAssistantWs:
                                   name = f"{name} {flex_hour} {measurement_direction}"
                                   statistic_id = f"{statistic_id}_{flex_hour.lower()}_{measurement_direction}"
                                   tag = flex_hour.lower()
-                                                      
+                                  #logging.info(f"self.usage_point_id_config : {self.usage_point_id_config}")
                                   if flex_hour == "normal_HC":
+                                    #logging.info(f"Tariff {data.date} consumption_price_flex_normal_hc {self.usage_point_id_config.consumption_price_flex_normal_hc}")
                                     cost = value * self.usage_point_id_config.consumption_price_flex_normal_hc / 1000
                                   elif flex_hour == "normal_HP":
-                                    cost = value * self.usage_point_id_config.consumption_price_flex_normal_hp / 1000    
+                                    #logging.info(f"Tariff {data.date} consumption_price_flex_normal_hp {self.usage_point_id_config.consumption_price_flex_normal_hp}")
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_normal_hp / 1000
                                   elif flex_hour == "sobriete_HC":
+                                    #logging.info(f"Tariff {data.date} consumption_price_flex_sobriete_hc {self.usage_point_id_config.consumption_price_flex_sobriete_hc}")
                                     cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hc / 1000
                                   elif flex_hour == "sobriete_HP":
-                                    cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hp / 1000                           
+                                    #logging.info(f"Tariff {data.date} consumption_price_flex_sobriete_hp {self.usage_point_id_config.consumption_price_flex_sobriete_hp}")
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_sobriete_hp / 1000
                                   elif flex_hour == "bonus_HC":
-                                    cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hc / 1000                           
+                                    #logging.info(f"Tariff {data.date} consumption_price_flex_bonus_hc {self.usage_point_id_config.consumption_price_flex_bonus_hc}")
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hc / 1000
                                   elif flex_hour == "bonus_HP":
-                                    cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hp / 1000     
+                                    #logging.info(f"Tariff {data.date} consumption_price_flex_bonus_hp {self.usage_point_id_config.consumption_price_flex_bonus_hp}")
+                                    cost = value * self.usage_point_id_config.consumption_price_flex_bonus_hp / 1000
                                   else:
                                     cost = 0.0                                                                                
                         else:

@@ -312,6 +312,12 @@ class UsagePointId:
                 data[key] = self.check_format(key, value)
             self.db.set(data)
 
+    def __str__(self):
+        return f"UsagePointId(usage_point_id={self.usage_point_id}, json={self.json})"
+
+    def __repr__(self):
+        return self.__str__()
+     
     def check_format(self, key, value):
         """Check if value is a datetime and return in datetime format (if datetime)."""
         try:
@@ -421,7 +427,7 @@ class UsagePointId:
     @property
     def consumption_price_flex_normal_hc(self) -> float:
         """Consumption price HC."""
-        return self._consumption_price_hc
+        return self._consumption_price_flex_normal_hc
 
     @consumption_price_flex_normal_hc.setter
     def consumption_price_flex_normal_hc(self, value):
@@ -452,15 +458,6 @@ class UsagePointId:
 
     @consumption_price_flex_sobriete_hc.setter
     def consumption_price_flex_sobriete_hc(self, value):
-        self.change(inspect.currentframe().f_code.co_name, value)
-
-    @property
-    def consumption_price_flex_sobriete_hp(self) -> float:
-        """Consumption sobriete HP."""
-        return self._consumption_price_flex_sobriete_hp
-
-    @consumption_price_flex_sobriete_hp.setter
-    def consumption_price_flex_sobriete_hp(self, value):
         self.change(inspect.currentframe().f_code.co_name, value)
 
     @property
