@@ -66,22 +66,57 @@ class Ecowatt:
 
     def fetch(self):
         """Fetches Ecowatt data and returns the result."""
+        retries = 3
         with APP_CONFIG.tracer.start_as_current_span(f"{__name__}.{inspect.currentframe().f_code.co_name}"):
             current_cache = DatabaseEcowatt().get()
             result = {}
             if not current_cache:
                 title("No cache")
-                result = self.run()
+                for attempt in range(retries):
+                    try:
+                        result = self.run()
+                        logging.info("Data fetched successfully.")
+                        break  # Exit loop if successful
+                    except requests.exceptions.ChunkedEncodingError as e:
+                        logging.error(f"Attempt {attempt + 1} failed due to ChunkedEncodingError: {e}. Retrying...")
+                    except requests.exceptions.RequestException as e:
+                        logging.error(f"Attempt {attempt + 1} failed due to a request exception: {e}. Retrying...")
+                    except Exception as e:
+                        logging.error(f"Attempt {attempt + 1} failed due to an unexpected error: {e}. Retrying...")
+                    
+                    if attempt == retries - 1:
+                        logging.error("All attempts failed. Unable to fetch EcoWatt data.")
+                        return {"error": "Unable to fetch data after multiple attempts."}
+                    
+                    time.sleep(2)  # Wait for 2 seconds before retrying
             else:
                 last_item = current_cache[0]
                 if last_item.date < self.valid_date:
-                    result = self.run()
+                    for attempt in range(retries):
+                        try:
+                            result = self.run()
+                            logging.info("Data fetched successfully.")
+                            break  # Exit loop if successful
+                        except requests.exceptions.ChunkedEncodingError as e:
+                            logging.error(f"Attempt {attempt + 1} failed due to ChunkedEncodingError: {e}. Retrying...")
+                        except requests.exceptions.RequestException as e:
+                            logging.error(f"Attempt {attempt + 1} failed due to a request exception: {e}. Retrying...")
+                        except Exception as e:
+                            logging.error(f"Attempt {attempt + 1} failed due to an unexpected error: {e}. Retrying...")
+                        
+                        if attempt == retries - 1:
+                            logging.error("All attempts failed. Unable to fetch EcoWatt data.")
+                            return {"error": "Unable to fetch data after multiple attempts."}
+                        
+                        time.sleep(2)  # Wait for 2 seconds before retrying
                 else:
                     logging.info(" => Toutes les données sont déjà en cache.")
+            
             if "error" not in result:
                 for key, value in result.items():
                     logging.info(f"{key}: {value['message']}")
             else:
                 logging.error(result)
                 return "OK"
+
             return result
